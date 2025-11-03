@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import stfmaster
 import requests
 
+from stfmaster import insert_item
+
 website_to_scrape = "https://store.steampowered.com"
 
 # parse and save robots.txt
@@ -29,10 +31,18 @@ def crawl_games():
             status_ok += 1
         else:
             game_urls.append(game.url)
-            print(f"ID: {game_id} erfolgreich hinzugefügt")
+            stfmaster.insert_item(game.url, "game_urls.txt")                      # storing the games to a file
+            print(f"ID: {game_id} erfolgreich hinzugefügt.")
             status_ok = 0
         game_id += 10
 
-def scrape_game_prices():
-    return
-    # some code for retrieving the prices idk
+def scrape_game_price():
+    for game_url in game_urls:
+        response = requests.get(game_url)
+        soup = BeautifulSoup(response.text, "html.parser")
+        price = soup.find_all("div",{"class":"game_purchase_price price"})
+        print(price)
+
+crawl_games()
+scrape_game_price()
+
