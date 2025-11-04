@@ -64,8 +64,8 @@ def remove_duplicates_from_games_file(filename="game_urls.txt"):
 
 def crawling(filename="game_urls.txt"):
     try:
-        with open(filename, 'r', encoding='utf-8') as file:
-            file.read().splitlines()
+        with open(filename, 'w', encoding='utf-8'):
+            pass
         get_start_game_id_for_next_crawl(filename)
         print("Continuing last crawl..")
     except FileNotFoundError or AttributeError:
