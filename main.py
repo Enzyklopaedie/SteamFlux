@@ -23,6 +23,21 @@ def crawl_games():
     status_ok = 0
     game_id = 10
 
+    saved_urls = []
+    try:
+        with open("game_urls.txt", 'r', encoding='utf-8') as file:
+            saved_urls = file.read().splitlines()
+            index = len(website_to_scrape) + 1
+            print(index)
+            for url in saved_urls:
+                game_id = url[index:].strip()
+                print(game_id)
+
+    except FileNotFoundError:
+        print("No existing crawled urls found.")
+
+
+
     while status_ok < 5:
         #
         game = requests.get(f"https://store.steampowered.com/app/{game_id}")

@@ -20,5 +20,3 @@ def get_games():
 def looking_around():
     response = requests.get(f"https://store.steampowered.com/app/10")
     print(response.text)
-
-looking_around()
