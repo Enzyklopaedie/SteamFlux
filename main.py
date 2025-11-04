@@ -1,6 +1,9 @@
+from traceback import print_last
+
 from bs4 import BeautifulSoup
 import stfmaster
 import requests
+import re
 
 
 from stfmaster import insert_item
@@ -22,37 +25,7 @@ for line in robots_txt.splitlines():
 # discover games
 game_urls = []
 
-def crawl_games():
-    status_ok = 0
-    game_id = 10
 
-    saved_urls = []
-    try:
-        with open("game_urls.txt", 'r', encoding='utf-8') as file:
-            saved_urls = file.read().splitlines()
-            index = len(website_to_scrape) + 1
-            print(index)
-            for url in saved_urls:
-                game_id = url[index:].strip()
-                print(game_id)
-
-    except FileNotFoundError:
-        print("No existing crawled urls found.")
-
-
-
-    while status_ok < 5:
-        #
-        game = requests.get(f"https://store.steampowered.com/app/{game_id}")
-        print(game)
-        if game.status_code != 200:
-            status_ok += 1
-        else:
-            game_urls.append(game.url)
-            stfmaster.insert_item(game.url, "game_urls.txt")                      # storing the games to a file
-            print(f"ID: {game_id} erfolgreich hinzugefügt.")
-            status_ok = 0
-        game_id += 10
 
 def scrape_game_price():
     for game_url in game_urls:
@@ -63,6 +36,6 @@ def scrape_game_price():
 
 
 
-crawl_games()
+# crawl_games()
 scrape_game_price()
 

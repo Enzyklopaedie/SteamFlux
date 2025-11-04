@@ -1,3 +1,5 @@
+import re
+
 import requests
 import stfmaster
 from main import website_to_scrape
@@ -5,11 +7,9 @@ from main import website_to_scrape
 
 game_urls = []
 
-def crawl_games():
+def crawl_games(filename="game_urls.txt", game_id=10):
+    remove_duplicates_from_games_file(filename)                 # prevent getting value of website_to_scrape as response
     status_ok = 0
-    game_id = 10
-
-
 
     while status_ok < 5:
         game = requests.get(f"{website_to_scrape}/app/{game_id}")
@@ -18,11 +18,29 @@ def crawl_games():
             status_ok += 1
         else:
             game_urls.append(game.url)
-            stfmaster.insert_item(game.url, "game_urls.txt")                      # storing the games to a file
+            stfmaster.insert_item(game.url, filename)                      # storing the games to a file
             print(f"ID: {game_id} erfolgreich hinzugefügt.")
             status_ok = 0
         game_id += 10
 
+# Extracting last item from file, getting its game id
+# and using it as seed for the next crawl process with the crawl_games() function
+
+def get_start_game_id_for_next_crawl(filename="game_urls.txt"):
+    remove_duplicates_from_games_file()
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            saved_urls = file.read().splitlines()
+            last_line = saved_urls[len(saved_urls) - 1]
+            extracted_game_id = int(re.search(r'/app/(\d+)', last_line).group(1))
+            # print("Last line is: ", last_line, "\nGame ID: ", extracted_game_id)
+            extracted_game_id = extracted_game_id + 10          # 10 is the default increment for giving out Game IDs
+                                                                # by Valve for games on Steam
+    except FileNotFoundError:
+        print("No existing crawled urls found.")
+        extracted_game_id = 10
+
+    crawl_games(filename, extracted_game_id)
 
 
 def remove_duplicates_from_games_file(filename="game_urls.txt"):
@@ -40,4 +58,6 @@ def remove_duplicates_from_games_file(filename="game_urls.txt"):
 def crawling():
     return
 
-remove_duplicates_from_games_file(filename="game_urls.txt")
+# crawl_games()
+get_start_game_id_for_next_crawl()
+# remove_duplicates_from_games_file(filename="game_urls.txt")
